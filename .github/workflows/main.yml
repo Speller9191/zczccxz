@@ -112,22 +112,44 @@ jobs:
     # Compile Sandboxie Core
     #
 
-      - name: Verify required Win32 NtCRT inputs
+      - name: Verify all checked-in NtCRT inputs
         shell: pwsh
         run: |
           $ErrorActionPreference = 'Stop'
+          # Keep this list in sync with CustomBuild/Object items in
+          # Sandboxie/core/dll/SboxDll.vcxproj. Both jobs build Win32 first;
+          # the x64 and ARM jobs also consume the corresponding NtCRT inputs.
           $requiredFiles = @(
             'Sandboxie/common/NtCRT/x86/ntdll.def',
+            'Sandboxie/common/NtCRT/x64/ntdll.def',
             'Sandboxie/common/NtCRT/x86/ntdll/eh3valid_user.obj',
             'Sandboxie/common/NtCRT/x86/ntdll/exsup.obj',
             'Sandboxie/common/NtCRT/x86/ntdll/exsup2.obj',
-            'Sandboxie/common/NtCRT/x86/ntdll/exsup3.obj'
+            'Sandboxie/common/NtCRT/x86/ntdll/exsup3.obj',
+            'Sandboxie/common/NtCRT/a64/libcmt/atomics.obj',
+            'Sandboxie/common/NtCRT/a64ec/libcmt/atomics.obj',
+            'Sandboxie/common/NtCRT/a64ec/libcmt/chkstk_arm64ec.obj',
+            'Sandboxie/common/NtCRT/a64ec/libcmt/chpev2_support.obj',
+            'Sandboxie/common/NtCRT/a64ec/libcmt/ecsecgs.obj',
+            'Sandboxie/common/NtCRT/a64ec/libcmt/gshandlerseh_amd64.obj',
+            'Sandboxie/common/NtCRT/a64ec/libcmt/gshandlerseh_arm64ec.obj',
+            'Sandboxie/common/NtCRT/a64ec/libcmt/gshandler_amd64.obj',
+            'Sandboxie/common/NtCRT/a64ec/libcmt/gshandler_arm64ec.obj',
+            'Sandboxie/common/NtCRT/a64ec/libcmt/gs_cookie.obj',
+            'Sandboxie/common/NtCRT/a64ec/libcmt/gs_report.obj',
+            'Sandboxie/common/NtCRT/a64ec/libcmt/guard_check_arm64ec.obj',
+            'Sandboxie/common/NtCRT/a64ec/libcmt/guard_dispatch.obj',
+            'Sandboxie/common/NtCRT/a64ec/libcmt/guard_support.obj',
+            'Sandboxie/common/NtCRT/a64ec/libcmt/icall_helper_arm64ec.obj',
+            'Sandboxie/common/NtCRT/a64ec/libcmt/loadcfg.obj'
           )
-          $missing = @($requiredFiles | Where-Object { -not (Test-Path -LiteralPath (Join-Path $env:GITHUB_WORKSPACE $_) -PathType Leaf) })
+          $missing = @($requiredFiles | Where-Object {
+            -not (Test-Path -LiteralPath (Join-Path $env:GITHUB_WORKSPACE $_) -PathType Leaf)
+          })
           if ($missing.Count -gt 0) {
-            throw ("Required Win32 NtCRT source inputs are missing:`n" + ($missing -join "`n") + "`nThese files are ignored by generic Visual Studio rules in some forks. Keep them committed in Sandboxie/common/NtCRT/x86/.")
+            throw ("Required NtCRT build inputs are missing:`n" + ($missing -join "`n") + "`nCommit all files under Sandboxie/common/NtCRT that are referenced by SboxDll.vcxproj. The generic Visual Studio ignore rules must not exclude them.")
           }
-          Write-Host 'All required Win32 NtCRT inputs are present.'
+          Write-Host "All $($requiredFiles.Count) required NtCRT inputs are present."
 
       - name: Build Sandboxie x86 (DLLs & svc)
         run: msbuild /t:build Sandboxie\SandboxDll.sln /p:Configuration="SbieRelease" /p:Platform=Win32 -maxcpucount:8
@@ -267,22 +289,44 @@ jobs:
     # Compile Sandboxie Core
     #
 
-      - name: Verify required Win32 NtCRT inputs
+      - name: Verify all checked-in NtCRT inputs
         shell: pwsh
         run: |
           $ErrorActionPreference = 'Stop'
+          # Keep this list in sync with CustomBuild/Object items in
+          # Sandboxie/core/dll/SboxDll.vcxproj. Both jobs build Win32 first;
+          # the x64 and ARM jobs also consume the corresponding NtCRT inputs.
           $requiredFiles = @(
             'Sandboxie/common/NtCRT/x86/ntdll.def',
+            'Sandboxie/common/NtCRT/x64/ntdll.def',
             'Sandboxie/common/NtCRT/x86/ntdll/eh3valid_user.obj',
             'Sandboxie/common/NtCRT/x86/ntdll/exsup.obj',
             'Sandboxie/common/NtCRT/x86/ntdll/exsup2.obj',
-            'Sandboxie/common/NtCRT/x86/ntdll/exsup3.obj'
+            'Sandboxie/common/NtCRT/x86/ntdll/exsup3.obj',
+            'Sandboxie/common/NtCRT/a64/libcmt/atomics.obj',
+            'Sandboxie/common/NtCRT/a64ec/libcmt/atomics.obj',
+            'Sandboxie/common/NtCRT/a64ec/libcmt/chkstk_arm64ec.obj',
+            'Sandboxie/common/NtCRT/a64ec/libcmt/chpev2_support.obj',
+            'Sandboxie/common/NtCRT/a64ec/libcmt/ecsecgs.obj',
+            'Sandboxie/common/NtCRT/a64ec/libcmt/gshandlerseh_amd64.obj',
+            'Sandboxie/common/NtCRT/a64ec/libcmt/gshandlerseh_arm64ec.obj',
+            'Sandboxie/common/NtCRT/a64ec/libcmt/gshandler_amd64.obj',
+            'Sandboxie/common/NtCRT/a64ec/libcmt/gshandler_arm64ec.obj',
+            'Sandboxie/common/NtCRT/a64ec/libcmt/gs_cookie.obj',
+            'Sandboxie/common/NtCRT/a64ec/libcmt/gs_report.obj',
+            'Sandboxie/common/NtCRT/a64ec/libcmt/guard_check_arm64ec.obj',
+            'Sandboxie/common/NtCRT/a64ec/libcmt/guard_dispatch.obj',
+            'Sandboxie/common/NtCRT/a64ec/libcmt/guard_support.obj',
+            'Sandboxie/common/NtCRT/a64ec/libcmt/icall_helper_arm64ec.obj',
+            'Sandboxie/common/NtCRT/a64ec/libcmt/loadcfg.obj'
           )
-          $missing = @($requiredFiles | Where-Object { -not (Test-Path -LiteralPath (Join-Path $env:GITHUB_WORKSPACE $_) -PathType Leaf) })
+          $missing = @($requiredFiles | Where-Object {
+            -not (Test-Path -LiteralPath (Join-Path $env:GITHUB_WORKSPACE $_) -PathType Leaf)
+          })
           if ($missing.Count -gt 0) {
-            throw ("Required Win32 NtCRT source inputs are missing:`n" + ($missing -join "`n") + "`nThese files are ignored by generic Visual Studio rules in some forks. Keep them committed in Sandboxie/common/NtCRT/x86/.")
+            throw ("Required NtCRT build inputs are missing:`n" + ($missing -join "`n") + "`nCommit all files under Sandboxie/common/NtCRT that are referenced by SboxDll.vcxproj. The generic Visual Studio ignore rules must not exclude them.")
           }
-          Write-Host 'All required Win32 NtCRT inputs are present.'
+          Write-Host "All $($requiredFiles.Count) required NtCRT inputs are present."
 
       - name: Build Sandboxie x86 (DLLs & svc)
         run: msbuild /t:build Sandboxie\SandboxDll.sln /p:Configuration="SbieRelease" /p:Platform=Win32 -maxcpucount:8

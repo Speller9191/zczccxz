@@ -22,24 +22,30 @@ still requires an appropriate business certificate when "business use"
 is selected.
 
 
-## Fix for MSB/LNK1104: missing `NtCRT\x86\ntdll.def`
+## Fix for MSB/LNK1104: missing NtCRT inputs
 
-The upstream `.gitignore` contains a broad `x86/` build-output rule. The
-`Sandboxie/common/NtCRT/x86/` folder is source code, not build output. This
-fork adds explicit negation rules so Git includes `ntdll.def`.
+The upstream `.gitignore` contains broad `x86/`, `x64/`, and `*.obj` rules.
+Sandboxie's `Sandboxie/common/NtCRT/` tree contains checked-in linker inputs,
+not build output: two `ntdll.def` files and prebuilt `.obj` files for Win32,
+x64, ARM64, and ARM64EC. This fork explicitly re-includes those inputs.
 
-If this file was already omitted from your fork, make sure it is present and
-commit it explicitly:
+When applying this overlay to an existing fork, make sure the complete tree is
+committed (changing `.gitignore` alone does not add files that Git previously
+ignored):
 
 ```powershell
+Test-Path .\Sandboxie\common\NtCRT\x64\ntdll.def
 Test-Path .\Sandboxie\common\NtCRT\x86\ntdll.def
-git add .gitignore Sandboxie/common/NtCRT/x86/ntdll.def
-git commit -m "Track required x86 NtCRT definition"
+git add .gitignore Sandboxie/common/NtCRT/
+git status --short
+git commit -m "Track required NtCRT linker inputs"
 git push
 ```
 
-The CI workflow now checks for this source input before either Win32 core
-build and reports a direct diagnostic rather than failing later in LINK.
+The CI preflight checks every NtCRT `.def` and `.obj` input referenced by
+`Sandboxie/core/dll/SboxDll.vcxproj` before the Win32 and architecture builds.
+If a required input is omitted from a fork commit, the workflow reports the
+missing file before invoking MSBuild.
 
 ## GitHub Actions
 

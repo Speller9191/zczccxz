@@ -375,13 +375,10 @@ SandboxiePlus/Build_*
 Installer/docs.7z
 Installer/_docs_src/
 
-
-# Keep the x86 NtCRT inputs in source control. The linker consumes these
-# prebuilt objects; the generic Visual Studio *.obj rule must not hide them.
+# Sandboxie links the prebuilt NtCRT inputs below. Visual Studio's generic
+# ignore rules hide x64/ directories and *.obj files, so explicitly keep
+# these checked-in inputs for Win32, x64, ARM64, and ARM64EC builds.
 !Sandboxie/common/NtCRT/x86/
-!Sandboxie/common/NtCRT/x86/ntdll.def
-!Sandboxie/common/NtCRT/x86/ntdll/
-!Sandboxie/common/NtCRT/x86/ntdll/eh3valid_user.obj
-!Sandboxie/common/NtCRT/x86/ntdll/exsup.obj
-!Sandboxie/common/NtCRT/x86/ntdll/exsup2.obj
-!Sandboxie/common/NtCRT/x86/ntdll/exsup3.obj
+!Sandboxie/common/NtCRT/x64/
+!Sandboxie/common/NtCRT/**/*.def
+!Sandboxie/common/NtCRT/**/*.obj
