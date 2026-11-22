@@ -9,7 +9,6 @@ on:
       # Case-sensitive paths to ignore on push events
       - '.editorconfig'
       - '.gitattributes'
-      - '.gitignore'
       - 'MergeDbg.cmd'
       - 'TestCI.cmd'
       - '.github/codeql/codeql-config.yml'
@@ -44,7 +43,6 @@ on:
       # Case-sensitive paths to ignore on pull events
       - '.editorconfig'
       - '.gitattributes'
-      - '.gitignore'
       - 'MergeDbg.cmd'
       - 'TestCI.cmd'
       - '.github/codeql/codeql-config.yml'
@@ -113,6 +111,16 @@ jobs:
     #
     # Compile Sandboxie Core
     #
+
+      - name: Verify required Win32 NtCRT definition
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $definition = Join-Path $env:GITHUB_WORKSPACE 'Sandboxie/common/NtCRT/x86/ntdll.def'
+          if (-not (Test-Path -LiteralPath $definition -PathType Leaf)) {
+            throw "Required source file is missing: $definition. The generic x86/ ignore rule can omit this file from forks; commit Sandboxie/common/NtCRT/x86/ntdll.def."
+          }
+          Write-Host "Found required source input: $definition"
 
       - name: Build Sandboxie x86 (DLLs & svc)
         run: msbuild /t:build Sandboxie\SandboxDll.sln /p:Configuration="SbieRelease" /p:Platform=Win32 -maxcpucount:8
@@ -251,6 +259,16 @@ jobs:
     #
     # Compile Sandboxie Core
     #
+
+      - name: Verify required Win32 NtCRT definition
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $definition = Join-Path $env:GITHUB_WORKSPACE 'Sandboxie/common/NtCRT/x86/ntdll.def'
+          if (-not (Test-Path -LiteralPath $definition -PathType Leaf)) {
+            throw "Required source file is missing: $definition. The generic x86/ ignore rule can omit this file from forks; commit Sandboxie/common/NtCRT/x86/ntdll.def."
+          }
+          Write-Host "Found required source input: $definition"
 
       - name: Build Sandboxie x86 (DLLs & svc)
         run: msbuild /t:build Sandboxie\SandboxDll.sln /p:Configuration="SbieRelease" /p:Platform=Win32 -maxcpucount:8

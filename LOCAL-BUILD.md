@@ -21,6 +21,26 @@ commercial-use certificate gate in the setup wizard. The setup wizard
 still requires an appropriate business certificate when "business use"
 is selected.
 
+
+## Fix for MSB/LNK1104: missing `NtCRT\x86\ntdll.def`
+
+The upstream `.gitignore` contains a broad `x86/` build-output rule. The
+`Sandboxie/common/NtCRT/x86/` folder is source code, not build output. This
+fork adds explicit negation rules so Git includes `ntdll.def`.
+
+If this file was already omitted from your fork, make sure it is present and
+commit it explicitly:
+
+```powershell
+Test-Path .\Sandboxie\common\NtCRT\x86\ntdll.def
+git add .gitignore Sandboxie/common/NtCRT/x86/ntdll.def
+git commit -m "Track required x86 NtCRT definition"
+git push
+```
+
+The CI workflow now checks for this source input before either Win32 core
+build and reports a direct diagnostic rather than failing later in LINK.
+
 ## GitHub Actions
 
 The existing `CI` workflow still builds the project. A dependent
