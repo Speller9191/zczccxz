@@ -1,0 +1,26 @@
+Sandboxie local portable fix overlay
+=====================================
+
+Extract this archive into the ROOT of your Sandboxie repository (merge/overwrite).
+It includes the required x86 NtCRT definition AND all four prebuilt x86 NtCRT
+object files. The updated .gitignore explicitly unignores these paths.
+
+Before committing, verify that Git no longer ignores the five required inputs:
+
+  git check-ignore -v Sandboxie/common/NtCRT/x86/ntdll.def
+  git check-ignore -v Sandboxie/common/NtCRT/x86/ntdll/*.obj
+
+Expected result: these commands print nothing and return a non-zero status because
+the files are no longer ignored. Then stage the files explicitly:
+
+  git add .gitignore .github/workflows/main.yml
+  git add Sandboxie/core/drv/verify.c Sandboxie/core/drv/local_build_config.h
+  git add Sandboxie/common/NtCRT/x86/ntdll.def
+  git add Sandboxie/common/NtCRT/x86/ntdll/*.obj
+  git add Installer/PORTABLE-README.txt LOCAL-BUILD.md
+  git commit -m "Fix Win32 NtCRT inputs for CI"
+  git push
+
+The workflow checks all five files before Win32 compilation. The original cause
+was the generic Visual Studio *.obj ignore pattern; a directory-only x86 exception
+was not sufficient.

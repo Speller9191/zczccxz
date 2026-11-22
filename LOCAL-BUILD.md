@@ -63,3 +63,9 @@ appears as a separate artifact after the x64 build succeeds.
   It permits private, non-commercial use of self-compiled binaries and
   places conditions on public distribution. See the license text included
   in the repository and in the portable package.
+
+The Win32 core build also requires the checked-in NtCRT inputs under
+`Sandboxie/common/NtCRT/x86/` (`ntdll.def` and four prebuilt `.obj` files).
+The root `.gitignore` explicitly re-includes these files; commit them to the
+fork so the GitHub Actions checkout receives them.
+

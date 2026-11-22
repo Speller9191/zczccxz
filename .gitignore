@@ -376,6 +376,12 @@ Installer/docs.7z
 Installer/_docs_src/
 
 
-# Keep the x86 NtCRT module definition in source control.
+# Keep the x86 NtCRT inputs in source control. The linker consumes these
+# prebuilt objects; the generic Visual Studio *.obj rule must not hide them.
 !Sandboxie/common/NtCRT/x86/
 !Sandboxie/common/NtCRT/x86/ntdll.def
+!Sandboxie/common/NtCRT/x86/ntdll/
+!Sandboxie/common/NtCRT/x86/ntdll/eh3valid_user.obj
+!Sandboxie/common/NtCRT/x86/ntdll/exsup.obj
+!Sandboxie/common/NtCRT/x86/ntdll/exsup2.obj
+!Sandboxie/common/NtCRT/x86/ntdll/exsup3.obj

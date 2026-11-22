@@ -112,15 +112,22 @@ jobs:
     # Compile Sandboxie Core
     #
 
-      - name: Verify required Win32 NtCRT definition
+      - name: Verify required Win32 NtCRT inputs
         shell: pwsh
         run: |
           $ErrorActionPreference = 'Stop'
-          $definition = Join-Path $env:GITHUB_WORKSPACE 'Sandboxie/common/NtCRT/x86/ntdll.def'
-          if (-not (Test-Path -LiteralPath $definition -PathType Leaf)) {
-            throw "Required source file is missing: $definition. The generic x86/ ignore rule can omit this file from forks; commit Sandboxie/common/NtCRT/x86/ntdll.def."
+          $requiredFiles = @(
+            'Sandboxie/common/NtCRT/x86/ntdll.def',
+            'Sandboxie/common/NtCRT/x86/ntdll/eh3valid_user.obj',
+            'Sandboxie/common/NtCRT/x86/ntdll/exsup.obj',
+            'Sandboxie/common/NtCRT/x86/ntdll/exsup2.obj',
+            'Sandboxie/common/NtCRT/x86/ntdll/exsup3.obj'
+          )
+          $missing = @($requiredFiles | Where-Object { -not (Test-Path -LiteralPath (Join-Path $env:GITHUB_WORKSPACE $_) -PathType Leaf) })
+          if ($missing.Count -gt 0) {
+            throw ("Required Win32 NtCRT source inputs are missing:`n" + ($missing -join "`n") + "`nThese files are ignored by generic Visual Studio rules in some forks. Keep them committed in Sandboxie/common/NtCRT/x86/.")
           }
-          Write-Host "Found required source input: $definition"
+          Write-Host 'All required Win32 NtCRT inputs are present.'
 
       - name: Build Sandboxie x86 (DLLs & svc)
         run: msbuild /t:build Sandboxie\SandboxDll.sln /p:Configuration="SbieRelease" /p:Platform=Win32 -maxcpucount:8
@@ -260,15 +267,22 @@ jobs:
     # Compile Sandboxie Core
     #
 
-      - name: Verify required Win32 NtCRT definition
+      - name: Verify required Win32 NtCRT inputs
         shell: pwsh
         run: |
           $ErrorActionPreference = 'Stop'
-          $definition = Join-Path $env:GITHUB_WORKSPACE 'Sandboxie/common/NtCRT/x86/ntdll.def'
-          if (-not (Test-Path -LiteralPath $definition -PathType Leaf)) {
-            throw "Required source file is missing: $definition. The generic x86/ ignore rule can omit this file from forks; commit Sandboxie/common/NtCRT/x86/ntdll.def."
+          $requiredFiles = @(
+            'Sandboxie/common/NtCRT/x86/ntdll.def',
+            'Sandboxie/common/NtCRT/x86/ntdll/eh3valid_user.obj',
+            'Sandboxie/common/NtCRT/x86/ntdll/exsup.obj',
+            'Sandboxie/common/NtCRT/x86/ntdll/exsup2.obj',
+            'Sandboxie/common/NtCRT/x86/ntdll/exsup3.obj'
+          )
+          $missing = @($requiredFiles | Where-Object { -not (Test-Path -LiteralPath (Join-Path $env:GITHUB_WORKSPACE $_) -PathType Leaf) })
+          if ($missing.Count -gt 0) {
+            throw ("Required Win32 NtCRT source inputs are missing:`n" + ($missing -join "`n") + "`nThese files are ignored by generic Visual Studio rules in some forks. Keep them committed in Sandboxie/common/NtCRT/x86/.")
           }
-          Write-Host "Found required source input: $definition"
+          Write-Host 'All required Win32 NtCRT inputs are present.'
 
       - name: Build Sandboxie x86 (DLLs & svc)
         run: msbuild /t:build Sandboxie\SandboxDll.sln /p:Configuration="SbieRelease" /p:Platform=Win32 -maxcpucount:8
